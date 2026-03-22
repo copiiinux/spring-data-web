@@ -1,6 +1,7 @@
 package ch.copiiinux.springdataweb;
 
-import ch.copiiinux.springdataweb.entity.Customer;
+import ch.copiiinux.springdataweb.dto.request.CustomerRequestDTO;
+import ch.copiiinux.springdataweb.mapper.CustomerMapper;
 import ch.copiiinux.springdataweb.repository.CustomerRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,22 +19,15 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner runner(final CustomerRepository repository) {
+    CommandLineRunner runner(final CustomerRepository repository, CustomerMapper customerMapper) {
         return _ -> {
-            List<Customer> results = new ArrayList<>();
-            Customer c = new Customer();
-            c.setName("aa");
-            results.add(c);
-            c.setName("cc");
-            results.add(c);
-            c.setName("bb");
-            results.add(c);
-            c.setName("ee");
-            results.add(c);
-            c.setName("dd");
-            results.add(c);
-            repository.saveAll(results);
+            List<CustomerRequestDTO> results = new ArrayList<>();
+            results.add(new CustomerRequestDTO("Abraham Lincoln"));
+            results.add(new CustomerRequestDTO("Béatrice de Cuir"));
+            results.add(new CustomerRequestDTO("Cindy Green"));
+            results.add(new CustomerRequestDTO("Fiona Green"));
+            results.add(new CustomerRequestDTO("Débora Hoffman"));
+            repository.saveAll(results.stream().map(customerMapper::map).toList());
         };
     }
-
 }
