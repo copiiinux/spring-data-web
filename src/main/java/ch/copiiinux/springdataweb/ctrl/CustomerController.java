@@ -21,7 +21,7 @@ public class CustomerController {
     /**
      * <code>HEAD /{repository}</code>
      *
-     * @return
+     * @return 204 if existing
      */
     @RequestMapping(method = RequestMethod.HEAD)
     public ResponseEntity<Void> headCollectionResource() {
@@ -31,7 +31,7 @@ public class CustomerController {
     /**
      * <code>GET /{repository}</code> - Returns the collection resource.
      *
-     * @return
+     * @return 200 with the collection resource
      */
     @GetMapping
     public ResponseEntity<List<Customer>> getCollectionResource() {
@@ -41,8 +41,8 @@ public class CustomerController {
     /**
      * <code>POST /{repository}</code> - Creates a new entity instance from the collection resource.
      *
-     * @param c
-     * @return
+     * @param c the new entity instance
+     * @return 201 with the new entity instance
      */
     @PostMapping
     public ResponseEntity<Customer> postCollectionResource(@RequestBody Customer c) {
@@ -52,8 +52,8 @@ public class CustomerController {
     /**
      * <code>HEAD /{repository}/{id}</code>
      *
-     * @param id
-     * @return
+     * @param id the id of the entity to check
+     * @return 204 if existing, 404 otherwise
      */
     @RequestMapping(path = "/{id}", method = RequestMethod.HEAD)
     public ResponseEntity<Void> headForItemResource(@PathVariable Long id) {
@@ -63,8 +63,8 @@ public class CustomerController {
     /**
      * <code>GET /{repository}/{id}</code> - Returns a single entity.
      *
-     * @param id
-     * @return
+     * @param id the id of the entity to return
+     * @return 200 with the entity, 404 otherwise
      */
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getItemResource(@PathVariable Long id) {
@@ -74,21 +74,24 @@ public class CustomerController {
     /**
      * <code>PUT /{repository}/{id}</code> - Updates an existing entity or creates one at exactly that place.
      *
-     * @param id
-     * @param c
-     * @return
+     * @param id the id of the entity to update
+     * @param c  the entity to update
+     * @return 200 with the updated entity, 201 if created
      */
     @PutMapping("{id}")
     public ResponseEntity<Customer> putItemResource(@PathVariable Long id, @RequestBody Customer c) {
-        return repository.existsById(id) ? ResponseEntity.ok(repository.save(c)) : ResponseEntity.notFound().build();
+        if (repository.existsById(id)) {
+            return ResponseEntity.ok(repository.save(c));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(c));
     }
 
     /**
      * <code>PATCH /{repository}/{id}</code> - Updates an existing entity or creates one at exactly that place.
      *
-     * @param id
-     * @param c
-     * @return
+     * @param id the id of the entity to update
+     * @param c  the entity to update
+     * @return 200 with the updated entity, 404 if not found
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Customer> patchItemResource(@PathVariable Long id, @RequestBody Customer c) {
@@ -98,8 +101,8 @@ public class CustomerController {
     /**
      * <code>DELETE /{repository}/{id}</code> - Deletes the entity backing the item resource.
      *
-     * @param id
-     * @return
+     * @param id the id of the entity to delete
+     * @return 204 if existing, 404 otherwise
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItemResource(@PathVariable Long id) {
