@@ -1,4 +1,4 @@
-# spring-data-rest
+# spring-data-web
 
 ### Run the app
 
