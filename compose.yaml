@@ -1,0 +1,6 @@
+services:
+  app:
+    image: copiiinux/spring-data-web:latest
+    build: .
+    ports:
+      - "8080:8080"
