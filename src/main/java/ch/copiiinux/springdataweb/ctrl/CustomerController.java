@@ -1,22 +1,24 @@
 package ch.copiiinux.springdataweb.ctrl;
 
-import ch.copiiinux.springdataweb.entity.Customer;
+import ch.copiiinux.springdataweb.dto.CustomerRequestDTO;
+import ch.copiiinux.springdataweb.dto.CustomerResponseDTO;
+import ch.copiiinux.springdataweb.mapper.CustomerMapper;
 import ch.copiiinux.springdataweb.repository.CustomerRepository;
+import ch.copiiinux.springdataweb.validation.ValidationGroups;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
+@AllArgsConstructor
 public class CustomerController {
-
+    private final CustomerMapper mapper;
     private final CustomerRepository repository;
-
-    public CustomerController(CustomerRepository repository) {
-        this.repository = repository;
-    }
 
     /**
      * <code>HEAD /{repository}</code>
@@ -34,19 +36,19 @@ public class CustomerController {
      * @return 200 with the collection resource
      */
     @GetMapping
-    public ResponseEntity<List<Customer>> getCollectionResource() {
-        return ResponseEntity.ok(repository.findAll());
+    public ResponseEntity<List<CustomerResponseDTO>> getCollectionResource() {
+        return ResponseEntity.ok(repository.findAll().stream().map(mapper::map).toList());
     }
 
     /**
      * <code>POST /{repository}</code> - Creates a new entity instance from the collection resource.
      *
-     * @param c the new entity instance
+     * @param dto the new entity instance
      * @return 201 with the new entity instance
      */
     @PostMapping
-    public ResponseEntity<Customer> postCollectionResource(@RequestBody Customer c) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(c));
+    public ResponseEntity<CustomerResponseDTO> postCollectionResource(@Validated(ValidationGroups.Full.class) @RequestBody CustomerRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(repository.save(mapper.map(dto))));
     }
 
     /**
@@ -67,35 +69,41 @@ public class CustomerController {
      * @return 200 with the entity, 404 otherwise
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getItemResource(@PathVariable Long id) {
-        return repository.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<CustomerResponseDTO> getItemResource(@PathVariable Long id) {
+        return repository.findById(id)
+                         .map(mapper::map)
+                         .map(ResponseEntity::ok)
+                         .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * <code>PUT /{repository}/{id}</code> - Updates an existing entity or creates one at exactly that place.
      *
-     * @param id the id of the entity to update
-     * @param c  the entity to update
+     * @param id  the id of the entity to update
+     * @param dto the entity to update
      * @return 200 with the updated entity, 201 if created
      */
-    @PutMapping("{id}")
-    public ResponseEntity<Customer> putItemResource(@PathVariable Long id, @RequestBody Customer c) {
-        if (repository.existsById(id)) {
-            return ResponseEntity.ok(repository.save(c));
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(c));
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerResponseDTO> putItemResource(@PathVariable Long id, @Validated(ValidationGroups.Full.class) @RequestBody CustomerRequestDTO dto) {
+        return repository.findById(id).map(e -> {
+            mapper.update(dto, e);
+            return ResponseEntity.ok(mapper.map(repository.save(e)));
+        }).orElseGet(() -> postCollectionResource(dto)); // lazy-eva
     }
 
     /**
      * <code>PATCH /{repository}/{id}</code> - Updates an existing entity or creates one at exactly that place.
      *
-     * @param id the id of the entity to update
-     * @param c  the entity to update
+     * @param id  the id of the entity to update
+     * @param dto the entity to update
      * @return 200 with the updated entity, 404 if not found
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<Customer> patchItemResource(@PathVariable Long id, @RequestBody Customer c) {
-        return repository.existsById(id) ? ResponseEntity.ok(repository.save(c)) : ResponseEntity.notFound().build();
+    public ResponseEntity<CustomerResponseDTO> patchItemResource(@PathVariable Long id, @Validated(ValidationGroups.Patch.class) @RequestBody CustomerRequestDTO dto) {
+        return repository.findById(id).map(e -> {
+            mapper.patch(dto, e);
+            return ResponseEntity.ok(mapper.map(repository.save(e)));
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -105,12 +113,10 @@ public class CustomerController {
      * @return 204 if existing, 404 otherwise
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItemResource(@PathVariable Long id) {
-        if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> deleteItemResource(@PathVariable Long id) {
+        return repository.findById(id).map(e -> {
+            repository.delete(e);
+            return ResponseEntity.noContent().build();
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 }
