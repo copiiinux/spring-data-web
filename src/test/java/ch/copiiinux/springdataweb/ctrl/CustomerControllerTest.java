@@ -1,6 +1,6 @@
 package ch.copiiinux.springdataweb.ctrl;
 
-import ch.copiiinux.springdataweb.dto.CustomerRequestDTO;
+import ch.copiiinux.springdataweb.dto.request.CustomerRequestDTO;
 import ch.copiiinux.springdataweb.entity.Customer;
 import ch.copiiinux.springdataweb.repository.CustomerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

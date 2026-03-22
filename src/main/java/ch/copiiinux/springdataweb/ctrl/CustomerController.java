@@ -1,7 +1,7 @@
 package ch.copiiinux.springdataweb.ctrl;
 
-import ch.copiiinux.springdataweb.dto.CustomerRequestDTO;
-import ch.copiiinux.springdataweb.dto.CustomerResponseDTO;
+import ch.copiiinux.springdataweb.dto.request.CustomerRequestDTO;
+import ch.copiiinux.springdataweb.dto.response.CustomerResponseDTO;
 import ch.copiiinux.springdataweb.mapper.CustomerMapper;
 import ch.copiiinux.springdataweb.repository.CustomerRepository;
 import ch.copiiinux.springdataweb.validation.ValidationGroups;

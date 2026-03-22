@@ -1,4 +1,4 @@
-package ch.copiiinux.springdataweb.dto;
+package ch.copiiinux.springdataweb.dto.request;
 
 import ch.copiiinux.springdataweb.validation.ValidationGroups;
 import jakarta.validation.constraints.NotNull;

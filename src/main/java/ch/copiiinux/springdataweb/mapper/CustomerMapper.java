@@ -1,7 +1,7 @@
 package ch.copiiinux.springdataweb.mapper;
 
-import ch.copiiinux.springdataweb.dto.CustomerRequestDTO;
-import ch.copiiinux.springdataweb.dto.CustomerResponseDTO;
+import ch.copiiinux.springdataweb.dto.request.CustomerRequestDTO;
+import ch.copiiinux.springdataweb.dto.response.CustomerResponseDTO;
 import ch.copiiinux.springdataweb.entity.Customer;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

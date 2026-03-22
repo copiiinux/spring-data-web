@@ -1,4 +1,4 @@
-package ch.copiiinux.springdataweb.dto;
+package ch.copiiinux.springdataweb.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
