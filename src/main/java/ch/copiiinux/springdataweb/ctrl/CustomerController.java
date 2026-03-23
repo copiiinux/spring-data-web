@@ -2,10 +2,13 @@ package ch.copiiinux.springdataweb.ctrl;
 
 import ch.copiiinux.springdataweb.dto.request.CustomerRequestDTO;
 import ch.copiiinux.springdataweb.dto.response.CustomerResponseDTO;
+import ch.copiiinux.springdataweb.helper.CustomExampleMatcher;
 import ch.copiiinux.springdataweb.mapper.CustomerMapper;
 import ch.copiiinux.springdataweb.repository.CustomerRepository;
 import ch.copiiinux.springdataweb.validation.ValidationGroups;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,11 +36,16 @@ public class CustomerController {
     /**
      * <code>GET /{repository}</code> - Returns the collection resource.
      *
+     * @param filter the filter to apply
+     * @param sort   the sort to apply
      * @return 200 with the collection resource
      */
     @GetMapping
-    public ResponseEntity<List<CustomerResponseDTO>> getCollectionResource() {
-        return ResponseEntity.ok(repository.findAll().stream().map(mapper::map).toList());
+    public ResponseEntity<List<CustomerResponseDTO>> getCollectionResource(@Validated(ValidationGroups.Patch.class) CustomerRequestDTO filter, Sort sort) {
+        return ResponseEntity.ok(repository.findAll(Example.of(mapper.map(filter), CustomExampleMatcher.DEFAULT), sort)
+                                           .stream()
+                                           .map(mapper::map)
+                                           .toList());
     }
 
     /**
