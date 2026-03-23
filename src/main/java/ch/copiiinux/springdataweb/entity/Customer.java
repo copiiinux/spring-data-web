@@ -10,10 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 
 @Entity
 @Getter
 @Setter
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
