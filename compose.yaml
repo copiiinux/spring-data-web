@@ -2,5 +2,8 @@ services:
   app:
     image: copiiinux/spring-data-web:latest
     build: .
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
     ports:
       - "8080:8080"
+    restart: unless-stopped
