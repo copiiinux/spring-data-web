@@ -1,3 +1,5 @@
+name: awesome
+
 services:
   app:
     image: copiiinux/spring-data-web:latest
