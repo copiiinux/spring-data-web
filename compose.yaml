@@ -1,3 +1,5 @@
+name: awesome
+
 services:
   app:
     image: copiiinux/spring-data-web:latest
@@ -7,3 +9,15 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+
+  db:
+    image: postgres:18.3-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: pg_isready -U postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - ./postgres:/var/lib/postgresql
